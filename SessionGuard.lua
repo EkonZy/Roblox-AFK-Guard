@@ -159,10 +159,11 @@ if promptOverlay then
                 return game:HttpGet(imageUrl)
             end)
             
-            if success and writefile and getcustomasset then
+            if success and type(response) == "string" and #response > 0 and writefile and getcustomasset then
                 writefile(fileName, response)
                 bgImage.Image = getcustomasset(fileName)
             else
+                warn("Failed to download image: " .. tostring(response))
                 bgImage.Image = imageUrl
             end
         end)
