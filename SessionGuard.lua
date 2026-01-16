@@ -152,7 +152,7 @@ if promptOverlay then
         bgImage.Parent = frame
         
         task.spawn(function()
-            local imageUrl = "https://cdn.discordapp.com/attachments/1399234975261524000/1461185106462113846/Oh_My_God.png?ex=6969a22c&is=696850ac&hm=834e2e7127c9444030a85837aec7e47978847a6f6e6d9325e9ce32abb08aba1f&"
+            local imageUrl = "https://raw.githubusercontent.com/EkonZy/Roblox-AFK-Guard/refs/heads/main/YFK.png"
             local fileName = "disconnect_monitor_bg_v5.png"
             
             local success, response = pcall(function()
