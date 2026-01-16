@@ -152,8 +152,8 @@ if promptOverlay then
         bgImage.Parent = frame
         
         task.spawn(function()
-            local imageUrl = "https://raw.githubusercontent.com/EkonZy/Roblox-AFK-Guard/refs/heads/main/YFK.png"
-            local fileName = "disconnect_monitor_bg_v5.png"
+            local imageUrl = "https://raw.githubusercontent.com/EkonZy/Roblox-AFK-Guard/main/YFK.png"
+            local fileName = "disconnect_monitor_bg_v6.png"
             
             local success, response = pcall(function()
                 return game:HttpGet(imageUrl)
