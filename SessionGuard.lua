@@ -71,36 +71,32 @@ if queue_on_teleport then
     local Players = game:GetService("Players")
     if Players.LocalPlayer then
         safeLog("Registering auto-execute for next server...")
-        
-        -- Capture own source code to ensure 100% persistence without file access reliance
-        local mySource = ""
-        if isfile(SELF_PATH) then
-            mySource = readfile(SELF_PATH)
-            safeLog("Successfully read self source code.")
-        else
-            safeLog("WARNING: Could not find self at " .. SELF_PATH .. ". Persistence might fail if file IO is blocked.")
-        end
-
         Players.LocalPlayer.OnTeleport:Connect(function(state)
             if state == Enum.TeleportState.Started or state == Enum.TeleportState.InProgress then
                  safeLog("Teleporting! Queueing persistence...")
-                 
-                 local queuePayload
-                 if mySource ~= "" then
-                     -- Option A: We have the source, just run it.
-                     -- Use robust string quoting to avoid syntax errors
-                     queuePayload = "task.wait(3); loadstring(" .. string.format("%q", mySource) .. ")()"
-                 else
-                     -- Option B: Fallback to reading file (risky)
-                      queuePayload = [[
-                         task.wait(3)
+                 -- We queue a command to re-run THIS file from autoexec.
+                 -- This relies on readfile working in the queue_on_teleport context.
+                 local queueCode = [[
+                     if not game:IsLoaded() then game.Loaded:Wait() end
+                     task.wait(2)
+                     
+                     local maxRetries = 20
+                     local attempt = 0
+                     
+                     while attempt < maxRetries do
                          if isfile("]] .. SELF_PATH .. [[") then
                              loadstring(readfile("]] .. SELF_PATH .. [["))()
+                             break
                          end
-                     ]]
-                 end
-                 
-                 queue_on_teleport(queuePayload)
+                         attempt = attempt + 1
+                         task.wait(1)
+                     end
+                     
+                     if attempt >= maxRetries then
+                         warn("Universal Persistence: CRITICAL FAILURE - Could not find self at ]] .. SELF_PATH .. [[ after 20s")
+                     end
+                 ]]
+                 queue_on_teleport(queueCode)
             end
         end)
     end
