@@ -307,3 +307,21 @@ if promptOverlay then
 else
     warn("Could not find promptOverlay.")
 end
+
+-- Queue on Teleport Logic (Persistence)
+local queue_on_teleport = queue_on_teleport or (syn and syn.queue_on_teleport) or (fluxus and fluxus.queue_on_teleport)
+
+if queue_on_teleport then
+    safeLog("Queueing script for next teleport...")
+    local Players = game:GetService("Players")
+    if Players.LocalPlayer then
+        Players.LocalPlayer.OnTeleport:Connect(function(state)
+            if state == Enum.TeleportState.Started or state == Enum.TeleportState.InProgress then
+                 safeLog("Teleport started! Queueing guard...")
+                 queue_on_teleport('loadstring(game:HttpGet("https://raw.githubusercontent.com/EkonZy/Roblox-AFK-Guard/main/SessionGuard.lua"))()')
+            end
+        end)
+    end
+else
+    safeLog("Executor does not support queue_on_teleport.")
+end
