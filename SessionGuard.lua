@@ -19,15 +19,48 @@ local Settings = {
     UseWebhook = true
 }
 
-local CoreGui = game:GetService("CoreGui")
-local RobloxPromptGui = CoreGui:WaitForChild("RobloxPromptGui", 10)
-
-if not RobloxPromptGui then
-    warn("Failed to find RobloxPromptGui. This script requires an executor with CoreGui access.")
-    return
+-- Logging System
+local function safeLog(msg)
+    if type(msg) ~= "string" then msg = tostring(msg) end
+    if writefile then
+        pcall(function()
+            -- Attempt to append if supported, otherwise just print to console to save IO
+             if appendfile then
+                appendfile("session_guard_log.txt", os.date("[%X] ") .. msg .. "\n")
+             else
+                -- Fallback for executors without appendfile (creates new file each time, less ideal but safe)
+                -- writefile("session_guard_log.txt", os.date("[%X] ") .. msg .. "\n")
+             end
+        end)
+    end
+    print(":: SG_DEBUG :: " .. msg)
 end
 
-local promptOverlay = RobloxPromptGui:WaitForChild("promptOverlay", 10)
+safeLog("Initialization started...")
+
+local CoreGui = game:GetService("CoreGui")
+local RobloxPromptGui
+
+-- Infinite retry loop for RobloxPromptGui
+while not RobloxPromptGui do
+    RobloxPromptGui = CoreGui:FindFirstChild("RobloxPromptGui")
+    if not RobloxPromptGui then
+        safeLog("Waiting for RobloxPromptGui...")
+        task.wait(2)
+    end
+end
+safeLog("RobloxPromptGui found.")
+
+-- Infinite retry loop for promptOverlay
+local promptOverlay
+while not promptOverlay do
+    promptOverlay = RobloxPromptGui:FindFirstChild("promptOverlay")
+    if not promptOverlay then
+        safeLog("Waiting for promptOverlay...")
+        task.wait(2)
+    end
+end
+safeLog("promptOverlay found. Script fully active.")
 
 local function onPromptShown()
     task.wait(0.5)
