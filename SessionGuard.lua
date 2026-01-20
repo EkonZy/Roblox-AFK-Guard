@@ -5,6 +5,15 @@
     Usage: getgenv().webhook = "URL"; loadstring(...)()
 ]]
 
+if not game:IsLoaded() then
+    game.Loaded:Wait()
+end
+
+local Players = game:GetService("Players")
+if not Players.LocalPlayer then
+    Players:GetPropertyChangedSignal("LocalPlayer"):Wait()
+end
+
 local Settings = {
     WebhookUrl = "", -- Placeholder (overridden by getgenv().webhook)
     UseWebhook = true
